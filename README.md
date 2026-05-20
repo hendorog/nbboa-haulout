@@ -9,9 +9,10 @@ Yard Captain. No app, no login, nothing to install.
 
 ## The live form
 
-➡️ **https://REPLACE-AFTER-PUBLISHING/**
+➡️ **https://hendorog.github.io/nbboa-haulout/**
 
-(That link is filled in once the site is published — see *Publishing* below.)
+(This is the personal-account test location. After migrating to the club
+Organization the link will change — re-share it then.)
 
 Send members **that link**, not a file. A link opens the form straight away;
 an emailed file makes them download it first.
