@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Encode the Yard Captain email</title>
+<link rel="icon" href="data:,">
+<style>
+  :root{ --navy:#0f344c; --navy2:#15506e; --sea:#1f7a8c; --line:#d8dee3; --ink:#1c2733; --muted:#5a6b78; --bg:#eef2f5; --warn:#b3320d; --warnbg:#fdece5; --ok:#1d7a3f; --okbg:#e9f6ee; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:24px 16px;text-align:center}
+  header .org{font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+  header h1{margin:6px 0 0;font-size:23px}
+  .wrap{max-width:680px;margin:0 auto;padding:0 16px 56px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:18px 0;box-shadow:0 1px 2px rgba(20,40,60,.05)}
+  h2{font-size:18px;color:var(--navy);margin:0 0 10px;border-bottom:2px solid var(--line);padding-bottom:8px}
+  label{display:block;font-weight:600;font-size:14px;margin:14px 0 4px}
+  input{width:100%;padding:11px;font-size:16px;border:1px solid #b9c3cb;border-radius:8px;font-family:inherit}
+  input:focus{outline:none;border-color:var(--sea);box-shadow:0 0 0 3px rgba(31,122,140,.18)}
+  input.bad{border-color:var(--warn);background:var(--warnbg)}
+  .out{margin-top:6px;display:flex;gap:10px;align-items:stretch}
+  .out code{flex:1;display:block;background:#f4f7f9;border:1px solid var(--line);border-radius:8px;padding:11px;font:15px/1.4 ui-monospace,Consolas,"Courier New",monospace;word-break:break-all;min-height:46px}
+  button{font:inherit;font-weight:600;cursor:pointer;border:1px solid transparent;border-radius:8px;padding:11px 16px;background:var(--sea);color:#fff;white-space:nowrap}
+  button:hover{background:#196576}
+  button:disabled{background:#9bb4bd;cursor:default}
+  .msg{font-size:13px;margin-top:6px;min-height:18px}
+  .msg.ok{color:var(--ok)}
+  .msg.warn{color:var(--warn)}
+  ol{margin:8px 0 0;padding-left:20px}
+  ol li{margin:6px 0}
+  .note{background:var(--okbg);border-left:4px solid var(--ok);padding:10px 14px;border-radius:0 8px 8px 0;font-size:14px;margin:14px 0}
+  code.inline{background:#eef2f5;padding:1px 5px;border-radius:4px;font-family:ui-monospace,Consolas,monospace}
+</style>
+</head>
+<body>
+<header>
+  <div class="org">Northcote &amp; Birkenhead Boat Owners Association</div>
+  <h1>Encode the Yard Captain email</h1>
+</header>
+<div class="wrap">
+
+  <div class="card">
+    <h2>1. Type the email address</h2>
+    <p>Type the address you want haul-out applications sent to (ideally a club
+       forwarding address, not a personal one).</p>
+    <label for="email">Email address</label>
+    <input id="email" type="email" inputmode="email" placeholder="haulout@nbboa.org.nz" autocomplete="off">
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>2. Copy the code</h2>
+    <p>This is the scrambled (Base64) version. It contains no readable address, so
+       spam bots can’t grab it — but the form decodes it back when a member clicks.</p>
+    <div class="out">
+      <code id="code">—</code>
+      <button id="copy" disabled>Copy</button>
+    </div>
+    <div class="msg ok" id="copied"></div>
+  </div>
+
+  <div class="card">
+    <h2>3. Put it in the form</h2>
+    <ol>
+      <li>Open <code class="inline">yard-captain-email.txt</code> in the project on GitHub.</li>
+      <li>Click the <strong>pencil</strong> (Edit) icon.</li>
+      <li>Delete what’s there and <strong>paste the copied code</strong> (just the code, nothing else).</li>
+      <li>Click <strong>Commit changes…</strong>, then <strong>Commit changes</strong>.</li>
+    </ol>
+    <div class="note">It can take up to ~10 minutes to take effect. If you make a
+      mistake, the form keeps using the previous address rather than breaking — just
+      redo the steps. Full instructions are in <code class="inline">CHANGE-EMAIL.md</code>.</div>
+  </div>
+
+</div>
+<script>
+  (function(){
+    var email = document.getElementById("email");
+    var code  = document.getElementById("code");
+    var copy   = document.getElementById("copy");
+    var msg    = document.getElementById("msg");
+    var copied = document.getElementById("copied");
+    var RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    var current = "";
+
+    function isAscii(s){ for(var i=0;i<s.length;i++){ if(s.charCodeAt(i)>127) return false; } return true; }
+
+    function update(){
+      copied.textContent = "";
+      var v = email.value.trim();
+      if(!v){ email.classList.remove("bad"); msg.textContent=""; msg.className="msg"; code.textContent="—"; copy.disabled=true; current=""; return; }
+      if(!RE.test(v) || !isAscii(v)){
+        email.classList.add("bad"); msg.textContent="That doesn’t look like a valid email address."; msg.className="msg warn";
+        code.textContent="—"; copy.disabled=true; current=""; return;
+      }
+      email.classList.remove("bad"); msg.textContent="Looks good."; msg.className="msg ok";
+      current = btoa(v); code.textContent = current; copy.disabled=false;
+    }
+
+    email.addEventListener("input", update);
+    copy.addEventListener("click", function(){
+      if(!current) return;
+      function done(){ copied.textContent="Copied — now paste it into yard-captain-email.txt"; }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(current).then(done, function(){ fallbackCopy(); });
+      } else { fallbackCopy(); }
+      function fallbackCopy(){
+        var r=document.createRange(); r.selectNode(code);
+        var s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        try{ document.execCommand("copy"); done(); }catch(e){ copied.textContent="Select the code above and copy it manually."; }
+        s.removeAllRanges();
+      }
+    });
+  })();
+</script>
+</body>
+</html>

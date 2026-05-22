@@ -22,7 +22,8 @@ an emailed file makes them download it first.
 | File | What it is | Who edits it |
 | --- | --- | --- |
 | `index.html` | The whole form (works on its own; the PDF engine is built in) | Tech support only |
-| `yard-captain-email.txt` | **Just the Yard Captain's email address**, on one line | Committee — see guide below |
+| `yard-captain-email.txt` | The Yard Captain's address, **scrambled (Base64)** so spam bots can't read it | Committee — see guide below |
+| `encode-email.html` | Helper page that scrambles a new address ready to paste into the file above | Committee, when changing the email |
 | `CHANGE-EMAIL.md` | How to change the Yard Captain's email address | — |
 | `MANAGE-ACCESS.md` | Who can edit this, and how to add/remove a person | — |
 

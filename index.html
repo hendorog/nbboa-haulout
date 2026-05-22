@@ -713,9 +713,10 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     postal: "PO Box 34672, North Shore 0632",
     bank: "Westpac 03 0114 0017484 00 — Northcote and Birkenhead Boat Owners Assn. Inc.",
     docVersion: "Updated 10/06/2026",
-    /* The Yard Captain's address is read from the file "yard-captain-email.txt".
+    /* The Yard Captain's address is read (Base64-encoded) from "yard-captain-email.txt"
+       so it never appears as plain text and can't be harvested by spam bots.
        The value below is only a fallback used if that file can't be read
-       (e.g. the page is opened offline). To change the address, edit the .txt file. */
+       (e.g. the page is opened offline). To change the address, see CHANGE-EMAIL.md. */
     captainEmail: "yard-captain@example.com",
     captains: "Mike Agteberg (021 951 971) · Craig Walker (027 572 1276)"
   };
@@ -915,9 +916,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   function toggleCradle(){ $("cradleNote").style.display = ($("ownCradle").value === "Yes") ? "block" : "none"; }
 
   /* ===== Read the Yard Captain's address from yard-captain-email.txt =====
-     Lets a non-technical committee member change the address by editing one
-     plain-text file. Tolerant of stray spaces/blank lines and "#" comments;
-     keeps the built-in fallback if the file is missing or invalid (e.g. offline). */
+     The file holds the address Base64-encoded (made with encode-email.html) so it
+     never appears as plain text anywhere a spam bot could scrape it. We decode it
+     here and rebuild the address only in memory. Tolerant of stray spaces/blank
+     lines and "#" comments; keeps the built-in fallback if the file is missing,
+     not valid Base64, or doesn't decode to an email (e.g. offline). */
   function loadCaptainEmail(){
     try{
       fetch("yard-captain-email.txt?cb=" + Date.now(), {cache:"no-store"})
@@ -925,7 +928,10 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         .then(function(t){
           var line = t.split(/\r?\n/).map(function(s){return s.trim();})
                       .filter(function(s){ return s && s.charAt(0) !== "#"; })[0];
-          if(line && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(line)){ CLUB.captainEmail = line; }
+          if(!line) return;
+          var email;
+          try{ email = atob(line); }catch(e){ return; }   /* not valid Base64 → keep fallback */
+          if(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ CLUB.captainEmail = email; }
         })
         .catch(function(){ /* keep built-in fallback */ });
     }catch(e){ /* fetch unsupported / offline — keep fallback */ }
